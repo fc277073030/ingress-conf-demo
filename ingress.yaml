@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fanchao-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      if ($cookie_region = '') {
+        add_header "Set-Cookie" "region=1";
+      }
+spec:
+  rules:
+    - host: fanchao.localhost
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: http-svc
+                port:
+                  number: 80
