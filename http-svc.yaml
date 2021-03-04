@@ -34,9 +34,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
-
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -51,3 +49,34 @@ spec:
       name: http
   selector:
     app: http-svc
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: http-svc-https
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`minio.fc277073030.com`) && PathPrefix(`/`)
+      kind: Rule
+      services:
+        - name: http-svc
+          port: 80
+  tls:
+    secretName: minio-tls
+    namespace: default
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: http-svc-http
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`minio.fc277073030.com`) && PathPrefix(`/`)
+      kind: Rule
+      services:
+        - name: http-svc
+          port: 80

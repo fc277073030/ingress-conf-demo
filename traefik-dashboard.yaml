@@ -1,0 +1,31 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: traefik-dashboard
+  namespace: traefik-v2
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: Host(`traefik.fc277073030.com`)
+      middlewares:
+        - name: middleware1
+          namespace: traefik-v2
+#      priority: 10
+      services:
+        - kind: TraefikService
+          name: foo
+          namespace: traefil-v2
+          passHostHeader: true
+          port: 80
+          responseForwarding:
+            flushInterval: 1ms
+          scheme: https
+          sticky:
+            cookie:
+              httpOnly: true
+              name: cookie
+              secure: true
+          strategy: RoundRobin
+          weight: 10

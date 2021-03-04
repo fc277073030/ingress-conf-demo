@@ -1,0 +1,4 @@
+configMapGenerator:
+  - name: nginx-conf
+    files:
+      - nginx.conf
