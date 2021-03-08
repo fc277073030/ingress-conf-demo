@@ -33,21 +33,21 @@ spec:
   selector:
     app: spring-demo
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
 metadata:
-  name: spring-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
+  name: spring-demo-headers
 spec:
-  rules:
-    - host: spring.localhost
-      http:
-        paths:
-          - path: /?(.*)
-            pathType: Prefix
-            backend:
-              service:
-                name: spring-demo
-                port:
-                  number: 8080
+  entrypoints:
+    - web
+  routes:
+    - match: Host(`spring.fc277073030.com`) && PathPrefix(`/`) && HeadersRegexp(`Cookie`,`region=1`)
+      kind: Rule
+      services:
+        - name: spring-demo
+          port: 8080
+#    - match: Headers(`X-ROUTE`,`nginx`)
+#      kind: Rule
+#      services:
+#        - name: nginx
+#          port: 80

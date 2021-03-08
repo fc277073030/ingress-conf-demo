@@ -50,22 +50,25 @@ spec:
   selector:
     app: http-svc
 ---
-apiVersion: traefik.containo.us/v1alpha1
-kind: IngressRoute
-metadata:
-  name: http-svc-https
-spec:
-  entryPoints:
-    - websecure
-  routes:
-    - match: Host(`minio.fc277073030.com`) && PathPrefix(`/`)
-      kind: Rule
-      services:
-        - name: http-svc
-          port: 80
-  tls:
-    secretName: minio-tls
-    namespace: default
+#apiVersion: traefik.containo.us/v1alpha1
+#kind: IngressRoute
+#metadata:
+#  name: http-svc-https
+#spec:
+#  entryPoints:
+#    - websecure
+#  routes:
+#    - match: Host(`minio.fc277073030.com`) && PathPrefix(`/`)
+#      kind: Rule
+#      services:
+#        - name: http-svc
+#          port: 80
+#      passHostHeader: true
+#      middlewares:
+#        - name: test-header
+#  tls:
+#    secretName: minio-tls
+#    namespace: default
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
@@ -80,3 +83,22 @@ spec:
       services:
         - name: http-svc
           port: 80
+      middlewares:
+        - name: test-header
+    - match: Host(`minio.fc277073030.com`) && PathPrefix(`/`) && Headers(`Cookie`,`region=2`)
+      kind: Rule
+      services:
+        - name: spring-demo
+          port: 8080
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: test-header
+spec:
+  headers:
+#    customRequestHeaders:
+#      Set-Cookie: region=2
+    customResponseHeaders:
+      Set-Cookie: region=2
